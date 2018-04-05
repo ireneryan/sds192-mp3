@@ -30,17 +30,13 @@ challengecourses<-macleish_layers[["challenge_courses"]]
 ```
 
 ```{r}
-url <- "http://wsgw.mass.gov/data/gispub/shape/state/contours250k.zip"
-local_file <- basename(url)
-download.file(url, destfile = local_file)
-unzip(local_file, exdir = "contour")
-
-library(sf)
-dsn <- path.expand("contour")
-
-contour_layer <- read_sf(dsn)
+elevation<-mass_gis()
 
 macleish_elevation<-macleish_intersect(contour_layer)
 ```
 
-
+1/2 mile from parking area
+within 200` of a stream/water source
+in a forest unlike the forest the other 2 are in
+relatively flat
+at least 500` from any research area or challenge course
