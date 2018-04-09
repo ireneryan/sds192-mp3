@@ -84,16 +84,23 @@ streams_buffer <- streams_inside %>%
 ```
 
 ```{r}
+pal <- colorNumeric(palette = "inferno",
+                    domain = boundelev[["CONTOUR_FT"]])
 leaflet() %>%
   addTiles %>%
   addPolygons(data = boundary, weight = 1, fillOpacity = 0.1) %>%
   addMarkers(data = st_transform(parking, crs = 4326), popup = "Parking") %>%
   addMarkers(data = group_campsite, popup = "Group Campsite") %>%
   addMarkers(data = remote_campsite, popup = "Remote Campsite") %>%
-  addPolygons(data = parking_buffer, opacity = 0.1, color = "green") %>%
+  addPolygons(data = parking_buffer, color = "green") %>%
   addPolylines(data = streams_buffer, fillOpacity = 0.5)
-```
 
+plot(contour_layer)
+            #, pal = pal, values = ~CONTOUR_FT,
+    #title = "Contour Elevation",
+    #opacity = 1)
+
+```
 
 
 1/2 mile from parking area
