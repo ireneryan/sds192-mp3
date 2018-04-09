@@ -29,12 +29,14 @@ landmarks<-macleish_layers[["landmarks"]]
 challengecourses<-macleish_layers[["challenge_courses"]]
 ```
 
-```{r}
+```{r, eval=FALSE}
 url <- "http://wsgw.mass.gov/data/gispub/shape/state/contours250k.zip"
 local_file <- basename(url)
 download.file(url, destfile = local_file)
 unzip(local_file, exdir = "contour")
+```
 
+```{r}
 library(sf)
 dsn <- path.expand("contour")
 dsn
@@ -43,6 +45,12 @@ contour_layer <- read_sf(dsn)
 st_layers(dsn)
 
 contour_layer <- st_transform(contour_layer, crs = 4326)
+
+boundelev<-macleish_layers[["boundary"]]%>%
+  st_intersection(contour_layer)
+
+boundelev%>%
+  plot()
 
 ```
 
