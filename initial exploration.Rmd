@@ -52,10 +52,11 @@ boundelev<-macleish_layers[["boundary"]]%>%
 
 boundelev%>%
   plot()
+
+macleish_layers[["boundary"]]
 ```
 
 ```{r}
-
 
 ```
 
@@ -72,14 +73,13 @@ relatively flat
 at least 500` from any research area or challenge course
 
 ```{r}
+library(leaflet)
 
-campground<-data.table(campsite=c("Group Campsite", "Remote Campsite"), longitude=c(42.450976, 42.458570), latitude=c(-72.678154, -72.674732))
-
-campgroundsf<-st_as_sf(campground, coords = c("longitude", "latitude"), crs = 4326)
-
-parking<-data.table(parking="Parking lot", longitude=42.448013, latitude=-72.680663)
-
-parkingsf<-st_as_sf(parking, coords = c("longitude", "latitude"), crs = 4326)
+leaflet()%>%
+  addTiles()%>%
+addPolygons(data=macleish_layers[["boundary"]])%>%
+addMarkers(data=campgroundsf)%>%
+addMarkers(data=parkingsf)
 
 ```
 
