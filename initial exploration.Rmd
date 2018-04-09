@@ -95,7 +95,7 @@ leaflet() %>%
 
 within 200` of a stream/water source
 
-in a forest unlike the forest the other 2 are in
+#in a forest unlike the forest the other 2 are in: Campsite cannot be in Red-Oak forest
 
 relatively flat
 
@@ -115,12 +115,7 @@ leaflet() %>%
   addMarkers(data = remote_campsite, popup = "Remote Campsite")%>%
   addPolylines(data=streams, weight=1)%>%
   addPolygons(data=wetlands, fillOpacity = 0.5)%>%
-  addPolygons(data=aggforests, fillOpacity = .1)
+  addPolygons(data=forests, fillOpacity = .1, weight=1)
+
+plot(forests["Sheet1__Na"])
 ```
-
-```{r}
-aggforests<-forests%>%
-  group_by(Sheet1__Na)
-```
-
-
