@@ -30,9 +30,20 @@ challengecourses<-macleish_layers[["challenge_courses"]]
 ```
 
 ```{r}
-elevation<-mass_gis()
+url <- "http://wsgw.mass.gov/data/gispub/shape/state/contours250k.zip"
+local_file <- basename(url)
+download.file(url, destfile = local_file)
+unzip(local_file, exdir = "contour")
 
-macleish_elevation<-macleish_intersect(contour_layer)
+library(sf)
+dsn <- path.expand("contour")
+dsn
+list.files(dsn)
+contour_layer <- read_sf(dsn)
+st_layers(dsn)
+
+contour_layer <- st_transform(contour_layer, crs = 4326)
+
 ```
 
 1/2 mile from parking area
