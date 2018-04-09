@@ -12,11 +12,8 @@ knitr::opts_chunk$set(echo = TRUE)
 library(macleish)
 library(tidyverse)
 library(sf)
-<<<<<<< HEAD
 library(leaflet)
-=======
 library(data.table)
->>>>>>> 923a898f87e75246041630578730d3230a189755
 ```
 
 ```{r}
@@ -56,40 +53,33 @@ boundelev <- boundary %>%
 
 boundelev%>%
   plot()
-<<<<<<< HEAD
 
 macleish_layers[["boundary"]]
-=======
-<<<<<<< HEAD
+
 boundelev %>%
   arrange(CONTOUR_FT)
 
 proj4_aea <- "+proj=aea +lat_1=29.5 +lat_2=42.5 +lat_0=37.5 +lon_0=-96 +x_0=0 +y_0=0 +ellps=GRS80 +datum=NAD83 +units=m +no_defs"
 
-point_to_s <- function(lat, lon) {
+point_to_sf <- function(lat, lon) {
   st_point(c(lat,lon)) %>%
     st_sfc(crs = 4326)
 }
 
-parking <- point_to_s(-72.680663, 42.448013) %>%
+parking <- point_to_sf(-72.680663, 42.448013) %>%
   st_transform(crs = proj4_aea)
 group_campsite <- point_to_sf(-72.678154, 42.450976)
 remote_campsite <- point_to_sf(-72.674732, 42.458570)
 
 # put 1/2 mi (804.672 m) buffer around parking area
-parking_buffer <- st_buffer(parking, dist = 804.672) %>%
+parking_buffer <- st_buffer(parking, dist = 402.336) %>%
   st_transform(crs = 4326)
+
+
 plot(parking_buffer)
-=======
->>>>>>> a4326a19b3002f2befc921c8cf163c6e9fa37111
 ```
 
 ```{r}
-
-<<<<<<< HEAD
-=======
->>>>>>> 923a898f87e75246041630578730d3230a189755
-
 leaflet() %>%
   addTiles %>%
   addPolygons(data = boundary, weight = 1, fillOpacity = 0.1) %>%
@@ -97,8 +87,6 @@ leaflet() %>%
   addMarkers(data = group_campsite, popup = "Group Campsite") %>%
   addMarkers(data = remote_campsite, popup = "Remote Campsite") %>%
   addPolygons(data = parking_buffer, weight = 1, opacity = 0.1)
-  
->>>>>>> a4326a19b3002f2befc921c8cf163c6e9fa37111
 ```
 
 
@@ -113,21 +101,26 @@ relatively flat
 
 at least 500` from any research area or challenge course
 
-```{r}
-library(leaflet)
-
-leaflet()%>%
-  addTiles()%>%
-addPolygons(data=macleish_layers[["boundary"]])%>%
-addMarkers(data=campgroundsf)%>%
-addMarkers(data=parkingsf)
-
-```
-
 Group Campsite (42.450976, -72.678154)
 Remote Campite (42.458570, -72.674732)
 Parking (42.448013, -72.680663)
 
 
+```{r}
+leaflet() %>%
+  addTiles %>%
+  addPolygons(data = boundary, weight = 1, fillOpacity = 0.1) %>%
+  addMarkers(data = st_transform(parking, crs = 4326), popup = "Parking") %>%
+  addMarkers(data = group_campsite, popup = "Group Campsite") %>%
+  addMarkers(data = remote_campsite, popup = "Remote Campsite")%>%
+  addPolylines(data=streams, weight=1)%>%
+  addPolygons(data=wetlands, fillOpacity = 0.5)%>%
+  addPolygons(data=aggforests, fillOpacity = .1)
+```
+
+```{r}
+aggforests<-forests%>%
+  group_by(Sheet1__Na)
+```
 
 
