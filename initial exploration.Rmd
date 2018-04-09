@@ -74,9 +74,13 @@ remote_campsite <- point_to_sf(-72.674732, 42.458570)
 # put 1/2 mi (804.672 m) buffer around parking area
 parking_buffer <- st_buffer(parking, dist = 402.336) %>%
   st_transform(crs = 4326)
-
-
-plot(parking_buffer)
+streams_inside <- boundary %>%
+  st_intersection(streams)
+  
+streams_buffer <- streams_inside %>%
+  st_transform(proj4_aea) %>%
+  st_buffer(dist = set_units(100, m)) %>%
+  st_transform(4326)
 ```
 
 ```{r}
@@ -86,7 +90,8 @@ leaflet() %>%
   addMarkers(data = st_transform(parking, crs = 4326), popup = "Parking") %>%
   addMarkers(data = group_campsite, popup = "Group Campsite") %>%
   addMarkers(data = remote_campsite, popup = "Remote Campsite") %>%
-  addPolygons(data = parking_buffer, weight = 1, opacity = 0.1)
+  addPolygons(data = parking_buffer, opacity = 0.1, color = "green") %>%
+  addPolylines(data = streams_buffer, fillOpacity = 0.5)
 ```
 
 
