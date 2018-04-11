@@ -2,10 +2,11 @@
 title: "mp3"
 output: html_document
 ---
+QUESTIONS FOR WEDNESDAY:
 
-Group Campsite (42.450976, -72.678154)
-Remote Campite (42.458570, -72.674732)
-Parking (42.448013, -72.680663)
+Make sure buffers are right size
+Remote Campsite location???
+Forest Aggregation
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
@@ -14,6 +15,7 @@ library(tidyverse)
 library(sf)
 library(leaflet)
 library(data.table)
+library(units)
 ```
 
 ```{r}
@@ -120,12 +122,27 @@ remote_campsite <- point_to_sf(-72.674732, 42.458570)
 # put 1/2 mi (804.672 m) buffer around parking area
 parking_buffer <- st_buffer(parking, dist = 402.336) %>%
   st_transform(crs = 4326)
+
 streams_inside <- boundary %>%
   st_intersection(streams)
+<<<<<<< HEAD
 library(units)
+=======
+
+parkbuffer<-parking%>%
+  st_transform(proj4_aea)%>%
+  st_buffer(dist=set_units(402.336, m))%>%
+  st_transform(4326)
+  
+>>>>>>> 046e98e8033b431375fba15b5f6e21470cf695dd
 streams_buffer <- streams_inside %>%
   st_transform(proj4_aea) %>%
   st_buffer(dist = set_units(100, m)) %>%
+  st_transform(4326)
+
+ccbuffer<-challengecourses%>%
+  st_transform(proj4_aea) %>%
+  st_buffer(dist = set_units(225, m)) %>%
   st_transform(4326)
 ```
 
@@ -142,7 +159,12 @@ Challenge course element locations shapefile
 Property Boundary shapefile
 =======
 ```{r}
+<<<<<<< HEAD
 library(macleish)
+=======
+bechtel <- data.frame(lat = 42.449167, lon = -72.679389)
+
+>>>>>>> 046e98e8033b431375fba15b5f6e21470cf695dd
 pal <- colorNumeric(palette = "inferno",
                     domain = macleish_layers[["contours_3m"]]$)
 library(RColorBrewer)
@@ -153,6 +175,7 @@ leaflet() %>%
   addMarkers(data = st_transform(parking, crs = 4326), popup = "Parking") %>%
   addMarkers(data = group_campsite, popup = "Group Campsite") %>%
   addMarkers(data = remote_campsite, popup = "Remote Campsite") %>%
+<<<<<<< HEAD
   addPolygons(data = parking_buffer, color = "green") %>%
   addPolylines(data = streams_buffer, fillOpacity = 0.5) %>%
   addPolygons(data = buildings, weight = 1, opacity = 1) %>%
@@ -161,10 +184,22 @@ leaflet() %>%
   addLegend(map, position = c("bottomright"), pal = ~pal(boundelev[["CONTOUR_FT"]]), opacity = 1, title = 'An', values = variable name)
 
 plot(contour_layer)
+=======
+  addPolygons(data = parking_buffer, color = "red") %>%
+  addPolylines(data = streams_buffer, fillOpacity = 0.5, color="green")%>%
+  addPolygons(data=researchbuffer,fillOpacity = 0, weight=.5)%>%
+  addPolygons(data=ccbuffer, fillOpacity = 0, weight=.5)%>%
+  addPolygons(data=wetlands)%>%
+  addMarkers(data=challengecourses)%>%
+  addPolygons(data=research)%>%
+ addMarkers(lng = ~lon, lat = ~lat, data = bechtel,
+             popup = "Bechtel Environmental Classroom")
+
+plot(boundelev["CONTOUR_FT"])
+>>>>>>> 046e98e8033b431375fba15b5f6e21470cf695dd
             #, pal = pal, values = ~CONTOUR_FT,
     #title = "Contour Elevation",
     #opacity = 1)
-
 ```
 ```{r}
 library(macleish)
@@ -173,14 +208,15 @@ library(macleish)
  
 
 
-1/2 mile from parking area
+#1/2 mile from parking area
 
-within 200` of a stream/water source
+#within 200` of a stream/water source
 
 #in a forest unlike the forest the other 2 are in: Campsite cannot be in Red-Oak forest
 
 relatively flat
 
+<<<<<<< HEAD
 at least 500` from any research area or challenge course
 <<<<<<< HEAD
 ```{r}
@@ -188,22 +224,21 @@ at least 500` from any research area or challenge course
 ```
 
 =======
+=======
+#at least 500` from any research area or challenge course
+>>>>>>> 046e98e8033b431375fba15b5f6e21470cf695dd
 
 Group Campsite (42.450976, -72.678154)
 Remote Campite (42.458570, -72.674732)
 Parking (42.448013, -72.680663)
 
 
+#FOREST AGGREGATION
+
 ```{r}
-leaflet() %>%
-  addTiles %>%
-  addPolygons(data = boundary, weight = 1, fillOpacity = 0.1) %>%
-  addMarkers(data = st_transform(parking, crs = 4326), popup = "Parking") %>%
-  addMarkers(data = group_campsite, popup = "Group Campsite") %>%
-  addMarkers(data = remote_campsite, popup = "Remote Campsite")%>%
-  addPolylines(data=streams, weight=1)%>%
-  addPolygons(data=wetlands, fillOpacity = 0.5)%>%
-  addPolygons(data=forests, fillOpacity = .1, weight=1)
+aggforests%>%
+  group_by(Sheet1__Na)%>%
+  mutate(area=st_area(geometry))
 
 plot(forests["Sheet1__Na"])
 ```
