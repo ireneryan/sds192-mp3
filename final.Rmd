@@ -15,9 +15,12 @@ library(tidyverse)
 library(sf)
 library(leaflet)
 library(units)
+library(RColorBrewer)
 ```
 
-```{r}
+#Extracting Data
+
+```{r, message=FALSE}
 trails<-macleish_layers[["trails"]]
 boundary<-macleish_layers[["boundary"]]
 
@@ -33,11 +36,11 @@ landmarks<-macleish_layers[["landmarks"]]
 challengecourses<-macleish_layers[["challenge_courses"]]
 
 contours<-macleish_layers[["contours_3m"]]
-
-names(macleish_layers)
 ```
 
-```{r}
+#Points
+
+```{r, message=FALSE}
 proj4_aea <- "+proj=aea +lat_1=29.5 +lat_2=42.5 +lat_0=37.5 +lon_0=-96 +x_0=0 +y_0=0 +ellps=GRS80 +datum=NAD83 +units=m +no_defs"
 
 point_to_sf <- function(lat, lon) {
@@ -50,7 +53,16 @@ parking <- point_to_sf(-72.680663, 42.448013) %>%
 group_campsite <- point_to_sf(-72.678154, 42.450976)
 remote_campsite <- point_to_sf(-72.674732, 42.458570)
 
-# put 1/2 mi (804.672 m) buffer around parking area
+bechtel <- data.frame(lat = 42.449167, lon = -72.679389)
+
+aggforests<-forests%>%
+  group_by(Sheet1__Na)%>%
+  summarise(n=n())
+```
+
+#Buffers
+
+```{r, message=FALSE}
 parking_buffer <- st_buffer(parking, dist = 402.336) %>%
   st_transform(crs = 4326)
 
@@ -83,25 +95,19 @@ wetlandbuffer<-wetlands%>%
   st_transform(4326)
 ```
 
-```{r}
-library(macleish)
+#Palettes
 
-bechtel <- data.frame(lat = 42.449167, lon = -72.679389)
-
-aggforests<-forests%>%
-  group_by(Sheet1__Na)%>%
-  summarise(n=n())
-
+```{r, message=FALSE}
 forestpalette<-colorFactor(palette = "viridis",
                     domain = aggforests$Sheet1__Na)
 
-library(RColorBrewer)
-bechtel <- data.frame(lat = 42.449167, lon = -72.679389)
-
 pale <- colorNumeric(palette = "inferno",
                     domain = contours$ELEV_M)
-library(leaflet)
+```
 
+#Full exploration plot
+
+```{r, message=FALSE}
 leaflet() %>%
   addTiles() %>%
   addPolygons(data = boundary, weight = 1, fillOpacity = 0.1)%>%
@@ -130,7 +136,7 @@ addPolygons(data = parking_buffer, color = "green") %>%
 
 #Campsite 1
 
-```{r}
+```{r, message=FALSE}
 flatland<-contours%>%
   filter(ELEV_M<=220)
 
@@ -154,6 +160,8 @@ leaflet()%>%
   addMarkers(data = remote_campsite, popup = "Remote Campsite")%>%
     addPolygons(data=fpsrc)
 ```
+ 
+#Campsite 2
  
 ```{r}
 flatparkingwet<-flatparking%>%
