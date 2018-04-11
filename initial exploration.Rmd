@@ -212,7 +212,7 @@ library(macleish)
  
 
 
-#1/2 mile from parking area
+#1/2 mile from parking area  
 
 #within 200` of a stream/water source
 
