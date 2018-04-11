@@ -32,7 +32,9 @@ buildings<-macleish_layers[["buildings"]]
 landmarks<-macleish_layers[["landmarks"]]
 challengecourses<-macleish_layers[["challenge_courses"]]
 
+contours<-macleish_layers[["contours_3m"]]
 
+names(macleish_layers)
 ```
 
 ```{r}
@@ -99,8 +101,9 @@ bechtel <- data.frame(lat = 42.449167, lon = -72.679389)
 pale <- colorNumeric(palette = "inferno",
                     domain = contours$ELEV_M)
 library(leaflet)
+
 leaflet() %>%
-  addTiles %>%
+  addTiles() %>%
   addPolygons(data = boundary, weight = 1, fillOpacity = 0.1)%>%
   addMarkers(data = st_transform(parking, crs = 4326), popup = "Parking") %>%
   addMarkers(data = group_campsite, popup = "Group Campsite")%>%
@@ -120,7 +123,54 @@ addPolygons(data = parking_buffer, color = "green") %>%
   addMarkers(lng = ~lon, lat = ~lat, data = bechtel,
              popup = "Bechtel Environmental Classroom") %>%
   addPolygons(data = contours, color = ~pale(ELEV_M), weight = 0.5) %>%
-  addPolygons(data=wetlandbuffer, color="green")
+  addPolygons(data=wetlandbuffer, color="green")%>%
   addLegend("bottomright", pal = pale, values = contours$ELEV_M)
 
+```
+
+#Campsite 1
+
+```{r}
+flatland<-contours%>%
+  filter(ELEV_M<=220)
+
+flatparking<-flatland%>%
+  st_intersection(parking_buffer)
+
+flatparkingstream<-flatparking%>%
+  st_intersection(streams_buffer)
+
+fpsr<-flatparkingstream%>%
+  st_difference(researchbuffer)
+
+fpsrc<-fpsr%>%
+  st_difference(ccbuffer)
+
+leaflet()%>%
+  addTiles%>%
+  addPolygons(data=aggforests, color = ~forestpalette(aggforests$Sheet1__Na), fillOpacity = 1)%>%
+  addLegend("bottomright", pal = forestpalette, values = aggforests$Sheet1__Na)%>%
+  addMarkers(data = group_campsite, popup = "Group Campsite") %>%
+  addMarkers(data = remote_campsite, popup = "Remote Campsite")%>%
+    addPolygons(data=fpsrc)
+```
+ 
+```{r}
+flatparkingwet<-flatparking%>%
+  st_intersection(wetlandbuffer)
+
+flatparkingwetr<-flatparkingwet%>%
+st_difference(researchbuffer)
+
+
+flatpwrc<-flatparkingwetr%>%
+  st_difference(ccbuffer)
+
+leaflet()%>%
+  addTiles%>%
+  addPolygons(data=aggforests, color = ~forestpalette(aggforests$Sheet1__Na), fillOpacity = 1)%>%
+  addLegend("bottomright", pal = forestpalette, values = aggforests$Sheet1__Na)%>%
+  addMarkers(data = group_campsite, popup = "Group Campsite") %>%
+  addMarkers(data = remote_campsite, popup = "Remote Campsite")%>%
+    addPolygons(data=flatpwrc)
 ```
