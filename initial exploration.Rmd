@@ -32,12 +32,7 @@ buildings<-macleish_layers[["buildings"]]
 
 landmarks<-macleish_layers[["landmarks"]]
 challengecourses<-macleish_layers[["challenge_courses"]]
-<<<<<<< HEAD
 
-contours30ft<-macleish_layers[["contours_30ft"]]
-
-contours3m<-macleish_layers[["contours_3m"]]
-=======
 contours <- macleish_layers[["contours_3m"]]
 
 ```
@@ -81,6 +76,13 @@ ccbuffer<-challengecourses%>%
 ```{r}
 bechtel <- data.frame(lat = 42.449167, lon = -72.679389)
 
+aggforests<-aggforests%>%
+  group_by(Sheet1__Na)%>%
+  summarise(n=n())
+
+forestpalette<-pale <- colorFactor(palette = "viridis",
+                    domain = aggforests$Sheet1__Na)
+
 pale <- colorNumeric(palette = "inferno",
                     domain = contours$ELEV_M)
 leaflet() %>%
@@ -100,6 +102,13 @@ leaflet() %>%
              popup = "Bechtel Environmental Classroom") %>%
   addPolygons(data = contours, color = ~pale(ELEV_M), weight = 0.5) %>%
   addLegend(pal = pale, values = contours$ELEV_M)
+
+  leaflet()%>%
+  addTiles%>%
+  addPolygons(data=aggforests, color = ~forestpalette(aggforests$Sheet1__Na), fillOpacity = 1)%>%
+  addLegend(pal = forestpalette, values = aggforests$Sheet1__Na)%>%
+  addMarkers(data = group_campsite, popup = "Group Campsite") %>%
+  addMarkers(data = remote_campsite, popup = "Remote Campsite")
 
 plot(boundelev["CONTOUR_FT"])
             #, pal = pal, values = ~CONTOUR_FT,
