@@ -84,7 +84,7 @@ leaflet() %>%
   addMarkers(data = remote_campsite, popup = "Remote Campsite") %>%
   addPolygons(data = parking_buffer, color = "red") %>%
   addPolylines(data = streams_buffer, fillOpacity = 0.5, color="green")%>%
-  addPolygons(data = researchbuffer,fillOpacity = 0, weight=.5)%>%
+ # addPolygons(data = researchbuffer,fillOpacity = 0, weight=.5)%>%
   addPolygons(data=ccbuffer, fillOpacity = 0, weight=.5)%>%
   addPolygons(data=wetlands)%>%
   addMarkers(data=challengecourses)%>%
