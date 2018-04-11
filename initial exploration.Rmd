@@ -32,10 +32,14 @@ buildings<-macleish_layers[["buildings"]]
 
 landmarks<-macleish_layers[["landmarks"]]
 challengecourses<-macleish_layers[["challenge_courses"]]
+<<<<<<< HEAD
 
 contours30ft<-macleish_layers[["contours_30ft"]]
 
 contours3m<-macleish_layers[["contours_3m"]]
+=======
+contours <- macleish_layers[["contours_3m"]]
+
 ```
 
 ```{r}
@@ -60,25 +64,25 @@ streams_inside <- boundary %>%
 
 parkbuffer<-parking%>%
   st_transform(proj4_aea)%>%
-  st_buffer(dist=set_units(402.336, m))%>%
+  st_buffer(dist= 402.336)%>%
   st_transform(4326)
   
 streams_buffer <- streams_inside %>%
   st_transform(proj4_aea) %>%
-  st_buffer(dist = set_units(100, m)) %>%
+  st_buffer(dist = 30.48) %>%
   st_transform(4326)
 
 ccbuffer<-challengecourses%>%
   st_transform(proj4_aea) %>%
-  st_buffer(dist = set_units(225, m)) %>%
+  st_buffer(dist = 68.58) %>%
   st_transform(4326)
 ```
 
 ```{r}
 bechtel <- data.frame(lat = 42.449167, lon = -72.679389)
 
-pal <- colorNumeric(palette = "inferno",
-                    domain = boundelev[["CONTOUR_FT"]])
+pale <- colorNumeric(palette = "inferno",
+                    domain = contours$ELEV_M)
 leaflet() %>%
   addTiles %>%
   addPolygons(data = boundary, weight = 1, fillOpacity = 0.1) %>%
@@ -87,13 +91,15 @@ leaflet() %>%
   addMarkers(data = remote_campsite, popup = "Remote Campsite") %>%
   addPolygons(data = parking_buffer, color = "red") %>%
   addPolylines(data = streams_buffer, fillOpacity = 0.5, color="green")%>%
-  addPolygons(data=researchbuffer,fillOpacity = 0, weight=.5)%>%
+  addPolygons(data = researchbuffer,fillOpacity = 0, weight=.5)%>%
   addPolygons(data=ccbuffer, fillOpacity = 0, weight=.5)%>%
   addPolygons(data=wetlands)%>%
   addMarkers(data=challengecourses)%>%
   addPolygons(data=research)%>%
- addMarkers(lng = ~lon, lat = ~lat, data = bechtel,
-             popup = "Bechtel Environmental Classroom")
+  addMarkers(lng = ~lon, lat = ~lat, data = bechtel,
+             popup = "Bechtel Environmental Classroom") %>%
+  addPolygons(data = contours, color = ~pale(ELEV_M), weight = 0.5) %>%
+  addLegend(pal = pale, values = contours$ELEV_M)
 
 plot(boundelev["CONTOUR_FT"])
             #, pal = pal, values = ~CONTOUR_FT,
@@ -122,9 +128,13 @@ Parking (42.448013, -72.680663)
 ```{r}
 aggforests<-aggforests%>%
   group_by(Sheet1__Na)%>%
-  summarise(combined=st_combine(geometry))
+  summarise(n=n())
 
-leaflet%>%
-  addPolygons(data=aggforests$combined)
+forestpalette<-pale <- colorFactor(palette = "inferno",
+                    domain = aggforests$Sheet1__Na)
+
+leaflet()%>%
+  addTiles()%>%
+  addPolygons(data=aggforests, color = ~forestpalette(aggforests$Sheet1__Na))
 
 ```
