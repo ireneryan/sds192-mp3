@@ -57,6 +57,8 @@ parking_buffer <- st_buffer(parking, dist = 402.336) %>%
 streams_inside <- boundary %>%
   st_intersection(streams)
 
+library(units)
+
 parkbuffer<-parking%>%
   st_transform(proj4_aea)%>%
   st_buffer(dist= 402.336)%>%
@@ -71,27 +73,55 @@ ccbuffer<-challengecourses%>%
   st_transform(proj4_aea) %>%
   st_buffer(dist = 68.58) %>%
   st_transform(4326)
+
+researchbuffer<-research%>%
+  st_transform(proj4_aea) %>%
+  st_buffer(dist = 68.58) %>%
+  st_transform(4326)
+
+wetlandbuffer<-wetlands%>%
+  st_transform(proj4_aea) %>%
+  st_buffer(dist = 68.58) %>%
+  st_transform(4326)
 ```
 
+
+MacLeish currently has two campsites - one large group site closer to the building and one remote campsite with two tent platforms about one mile from the parking area. We would like to develop one additional campsite that is approximately half a mile walk from the parking area, within 200’ of a stream or other source of water, in forest that is unlike the forest in the two other campsites, relatively flat, and at least 500’ from any research area or any element of the Challenge Course. Propose two new campsite locations for our consideration.
+Supporting data includes:
+Existing trails shapefile
+10’ contour elevation data
+vegetation type shapefile
+hydrology (streams, wetlands, etc.) shapefile
+Research locations shapefile
+Challenge course element locations shapefile
+Property Boundary shapefile
+=======
 ```{r}
+
+library(macleish)
+
 bechtel <- data.frame(lat = 42.449167, lon = -72.679389)
 
-aggforests<-aggforests%>%
+aggforests<-forests%>%
   group_by(Sheet1__Na)%>%
   summarise(n=n())
 
-forestpalette<-pale <- colorFactor(palette = "viridis",
+forestpalette<-colorFactor(palette = "viridis",
                     domain = aggforests$Sheet1__Na)
+
+library(RColorBrewer)
 
 pale <- colorNumeric(palette = "inferno",
                     domain = contours$ELEV_M)
+
 leaflet() %>%
   addTiles %>%
   addPolygons(data = boundary, weight = 1, fillOpacity = 0.1) %>%
   addMarkers(data = st_transform(parking, crs = 4326), popup = "Parking") %>%
   addMarkers(data = group_campsite, popup = "Group Campsite") %>%
   addMarkers(data = remote_campsite, popup = "Remote Campsite") %>%
-  addPolygons(data = parking_buffer, color = "red") %>%
+addPolygons(data = parking_buffer, color = "green") %>%
+  addPolygons(data = buildings, weight = 1, opacity = 1)%>%
   addPolylines(data = streams_buffer, fillOpacity = 0.5, color="green")%>%
   addPolygons(data = researchbuffer,fillOpacity = 0, weight=.5)%>%
   addPolygons(data=ccbuffer, fillOpacity = 0, weight=.5)%>%
@@ -101,49 +131,71 @@ leaflet() %>%
   addMarkers(lng = ~lon, lat = ~lat, data = bechtel,
              popup = "Bechtel Environmental Classroom") %>%
   addPolygons(data = contours, color = ~pale(ELEV_M), weight = 0.5) %>%
-  addLegend(pal = pale, values = contours$ELEV_M)
+  addPolygons(data=wetlandbuffer, color="green")
+  addLegend("bottomright", pal = pale, values = contours$ELEV_M)
+```
 
-  leaflet()%>%
+#Campsite 1
+
+```{r}
+flatland<-contours%>%
+  filter(ELEV_M<=220)
+
+flatparking<-flatland%>%
+  st_intersection(parking_buffer)
+
+flatparkingstream<-flatparking%>%
+  st_intersection(streams_buffer)
+
+fpsr<-flatparkingstream%>%
+  st_difference(researchbuffer)
+
+fpsrc<-fpsr%>%
+  st_difference(ccbuffer)
+
+leaflet()%>%
   addTiles%>%
   addPolygons(data=aggforests, color = ~forestpalette(aggforests$Sheet1__Na), fillOpacity = 1)%>%
-  addLegend(pal = forestpalette, values = aggforests$Sheet1__Na)%>%
+  addLegend("bottomright", pal = forestpalette, values = aggforests$Sheet1__Na)%>%
   addMarkers(data = group_campsite, popup = "Group Campsite") %>%
-  addMarkers(data = remote_campsite, popup = "Remote Campsite")
+  addMarkers(data = remote_campsite, popup = "Remote Campsite")%>%
+    addPolygons(data=fpsrc)
+```
+ 
+```{r}
+flatparkingwet<-flatparking%>%
+  st_intersection(wetlandbuffer)
 
-plot(boundelev["CONTOUR_FT"])
-            #, pal = pal, values = ~CONTOUR_FT,
-    #title = "Contour Elevation",
-    #opacity = 1)
+flatparkingwetr<-flatparkingwet%>%
+st_difference(researchbuffer)
+
+flatpwrc<-flatparkingwetr%>%
+  st_difference(ccbuffer)
+
+leaflet()%>%
+  addTiles%>%
+  addPolygons(data=aggforests, color = ~forestpalette(aggforests$Sheet1__Na), fillOpacity = 1)%>%
+  addLegend("bottomright", pal = forestpalette, values = aggforests$Sheet1__Na)%>%
+  addMarkers(data = group_campsite, popup = "Group Campsite") %>%
+  addMarkers(data = remote_campsite, popup = "Remote Campsite")%>%
+    addPolygons(data=flatpwrc)
 ```
 
 
-#1/2 mile from parking area
+MacLeish currently has two campsites - one large group site closer to the building and one remote campsite with two tent platforms about one mile from the parking area. 
+We would like to develop one additional campsite that is approximately half a mile walk from the parking area, 
+within 200’ of a stream or other source of water, 
+in forest that is unlike the forest in the two other campsites, 
+relatively flat, and at
+least 500’ from any research area or any element of the Challenge Course. 
 
-#within 200` of a stream/water source
+Propose two new campsite locations for our consideration.
 
-#in a forest unlike the forest the other 2 are in: Campsite cannot be in Red-Oak forest
 
-relatively flat
-
-#at least 500` from any research area or challenge course
 
 Group Campsite (42.450976, -72.678154)
 Remote Campite (42.458570, -72.674732)
 Parking (42.448013, -72.680663)
 
 
-#FOREST AGGREGATION
 
-```{r}
-aggforests<-aggforests%>%
-  group_by(Sheet1__Na)%>%
-  summarise(n=n())
-
-forestpalette<-pale <- colorFactor(palette = "inferno",
-                    domain = aggforests$Sheet1__Na)
-
-leaflet()%>%
-  addTiles()%>%
-  addPolygons(data=aggforests, color = ~forestpalette(aggforests$Sheet1__Na))
-
-```
