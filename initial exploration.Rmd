@@ -57,17 +57,17 @@ streams_inside <- boundary %>%
 
 parkbuffer<-parking%>%
   st_transform(proj4_aea)%>%
-  st_buffer(dist=set_units(402.336, m))%>%
+  st_buffer(dist= 402.336)%>%
   st_transform(4326)
   
 streams_buffer <- streams_inside %>%
   st_transform(proj4_aea) %>%
-  st_buffer(dist = set_units(100, m)) %>%
+  st_buffer(dist = 30.48) %>%
   st_transform(4326)
 
 ccbuffer<-challengecourses%>%
   st_transform(proj4_aea) %>%
-  st_buffer(dist = set_units(225, m)) %>%
+  st_buffer(dist = 68.58) %>%
   st_transform(4326)
 ```
 
@@ -84,7 +84,7 @@ leaflet() %>%
   addMarkers(data = remote_campsite, popup = "Remote Campsite") %>%
   addPolygons(data = parking_buffer, color = "red") %>%
   addPolylines(data = streams_buffer, fillOpacity = 0.5, color="green")%>%
-  #addPolygons(data=researchbuffer,fillOpacity = 0, weight=.5)%>%
+  addPolygons(data = researchbuffer,fillOpacity = 0, weight=.5)%>%
   addPolygons(data=ccbuffer, fillOpacity = 0, weight=.5)%>%
   addPolygons(data=wetlands)%>%
   addMarkers(data=challengecourses)%>%
