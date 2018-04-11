@@ -32,7 +32,14 @@ buildings<-macleish_layers[["buildings"]]
 
 landmarks<-macleish_layers[["landmarks"]]
 challengecourses<-macleish_layers[["challenge_courses"]]
+<<<<<<< HEAD
+
+contours30ft<-macleish_layers[["contours_30ft"]]
+
+contours3m<-macleish_layers[["contours_3m"]]
+=======
 contours <- macleish_layers[["contours_3m"]]
+
 ```
 
 ```{r}
@@ -240,11 +247,17 @@ Parking (42.448013, -72.680663)
 #FOREST AGGREGATION
 
 ```{r}
-aggforests%>%
+aggforests<-aggforests%>%
   group_by(Sheet1__Na)%>%
-  mutate(area=st_area(geometry))
+  summarise(n=n())
 
-plot(forests["Sheet1__Na"])
+forestpalette<-pale <- colorFactor(palette = "inferno",
+                    domain = aggforests$Sheet1__Na)
+
+leaflet()%>%
+  addTiles()%>%
+  addPolygons(data=aggforests, color = ~forestpalette(aggforests$Sheet1__Na))
+
 ```
  
 ```{r}
