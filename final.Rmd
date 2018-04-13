@@ -2,11 +2,25 @@
 title: "mp3: final"
 output: html_document
 ---
-QUESTIONS FOR WEDNESDAY:
 
-Make sure buffers are right size
-Remote Campsite location???
-Forest Aggregation
+
+
+##In addition to two plots with a campsite each, maybe inclide one that has the blue regions that could work?
+
+#I think our buffer is the wrong size, need to double it like it was before
+
+#Fix campsite 2 location: 42.458549, -72.679581
+
+
+#Abandonded pasture could work, depends when it was abandoned (according to Reed), better than the "old field/pasture"
+
+#Not the vernal pool area, TOO MANY MOSQUITOS AND WET!!
+
+#10x10 feet campsite, 20x25 for bigger
+
+#Campsite in sugar maple would not disrupt tapping
+
+#getting materials in to the site is hard, need 4 wheel drive vehicle, takes lumber, harder if further away from the parking lot ($3000 to build the group campsite's lean-to)
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
@@ -50,7 +64,8 @@ point_to_sf <- function(lat, lon) {
 
 parking <- point_to_sf(-72.680663, 42.448013) %>%
   st_transform(crs = proj4_aea)
-group_campsite <- point_to_sf(-72.678154, 42.450976)
+
+group_campsite <- point_to_sf(-72.678154, 42.450976) 
 remote_campsite <- point_to_sf(-72.674732, 42.458570)
 
 bechtel <- data.frame(lat = 42.449167, lon = -72.679389)
@@ -182,3 +197,5 @@ leaflet()%>%
   addMarkers(data = remote_campsite, popup = "Remote Campsite")%>%
     addPolygons(data=flatpwrc)
 ```
+
+
