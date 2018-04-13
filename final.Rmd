@@ -2,14 +2,9 @@
 title: "mp3: final"
 output: html_document
 ---
-
-
-
 ##In addition to two plots with a campsite each, maybe inclide one that has the blue regions that could work?
 
 #I think our buffer is the wrong size, need to double it like it was before
-
-#Fix campsite 2 location: 42.458549, -72.679581
 
 
 #Abandonded pasture could work, depends when it was abandoned (according to Reed), better than the "old field/pasture"
@@ -65,6 +60,10 @@ parking <- point_to_sf(-72.680663, 42.448013) %>%
   st_transform(crs = proj4_aea)
 
 group_campsite <- point_to_sf(-72.678154, 42.450976) 
+<<<<<<< HEAD
+=======
+
+>>>>>>> f1627d61c832a298bda7961f0f1ac23afb6fe69d
 remote_campsite <- point_to_sf(-72.679581, 42.458549)
 
 bechtel <- data.frame(lat = 42.449167, lon = -72.679389)
@@ -77,7 +76,7 @@ aggforests<-forests%>%
 #Buffers
 
 ```{r, message=FALSE}
-parking_buffer <- st_buffer(parking, dist = 402.336) %>%
+parking_buffer <- st_buffer(parking, dist = 804.672) %>%
   st_transform(crs = 4326)
 
 streams_inside <- boundary %>%
