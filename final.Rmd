@@ -1,9 +1,11 @@
 ---
 title: "mp3: final"
-output: html_document
+output: 
+  html_document:
+    code_folding: hide
 ---
 
-```{r setup, include=FALSE}
+```{r setup, include = FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 library(macleish)
 library(tidyverse)
@@ -15,7 +17,7 @@ library(RColorBrewer)
 # Extracting Data
 
 Here we simply extracted the macleish layers to make working with them easier.
-```{r, message=FALSE}
+```{r, message = FALSE}
 trails <- macleish_layers[["trails"]]
 boundary <- macleish_layers[["boundary"]]
 
@@ -33,10 +35,10 @@ challengecourses <- macleish_layers[["challenge_courses"]]
 contours <- macleish_layers[["contours_3m"]]
 ```
 
-#Points
+# Points
 
 In order to work with the coordinates listed in the instructions, we used a function that would convert them to latitude and longitude geometries. We also aggregated/tidied the forest layer so that all of the same forest types had their geometries together. The proj4-aea line was so we could convert the data to the Alber's Equal Area projection, which is in meters, so the data had an easy unit to work with.
-```{r, message=FALSE}
+```{r, message = FALSE}
 proj4_aea <- "+proj=aea +lat_1=29.5 +lat_2=42.5 +lat_0=37.5 +lon_0=-96 +x_0=0 +y_0=0 +ellps=GRS80 +datum=NAD83 +units=m +no_defs"
 
 point_to_sf <- function(lat, lon) {
@@ -61,7 +63,7 @@ aggforests<-forests%>%
 # Buffers
 
 This was how we created the regions of plausible and impossible campsites. We converted them to the aea projection so we could work in meters, then converted them back to EPSG 4326 for mapping.
-```{r, message=FALSE, warning=FALSE}
+```{r, message = FALSE, warning = FALSE}
 parking_buffer <- st_buffer(parking, dist = 804.672) %>%
   st_transform(crs = 4326)
 
@@ -97,7 +99,7 @@ wetlandbuffer <- wetlands %>%
 # Palettes
 
 These are the palettes for the forest types and the contours layer.
-```{r, message=FALSE}
+```{r, message = FALSE}
 forestpalette <- colorFactor(palette = "viridis",
                     domain = aggforests$Sheet1__Na)
 
@@ -138,7 +140,7 @@ leaflet() %>%
 # Campsite 1
 
 In order to find the regions we could place a site, we used a series of st_intersection() and st_difference on the buffers we created. You can see the highlighted areas in red where these intersections and differences coincide to give us the possible locations.
-```{r, message=FALSE}
+```{r, message = FALSE, warning = FALSE}
 flatland <- contours %>%
   filter(ELEV_M<=220)
 
@@ -148,11 +150,14 @@ flatparking <- flatland %>%
 flatparkingstream <- flatparking %>%
   st_intersection(streams_buffer)
 
-fpsr<-flatparkingstream%>%
+fpsr <- flatparkingstream %>%
   st_difference(researchbuffer)
 
 fpsrc <- fpsr %>%
   st_difference(ccbuffer)
+
+campsite1 <- point_to_sf(-72.678393, 42.444742)
+
 
 leaflet() %>%
   addTiles() %>%
@@ -162,16 +167,17 @@ leaflet() %>%
   addLegend("bottomright", 
             pal = forestpalette,
             values = aggforests$Sheet1__Na,
-            opacity=1) %>%
+            opacity = 1) %>%
   addMarkers(data = group_campsite, popup = "Group Campsite") %>%
   addMarkers(data = remote_campsite, popup = "Remote Campsite") %>%
-  addPolygons(data = fpsrc, color="red")
+  addMarkers(data = campsite1, popup = "Campsite 1") %>%
+  addPolygons(data = fpsrc, color = "red")
 ```
  
 # Campsite 2
  
 Same process as in campsite 1.
-```{r}
+```{r, warning = FALSE, message = FALSE}
 flatparkingwet <- flatparking %>%
   st_intersection(wetlandbuffer)
 
@@ -181,6 +187,8 @@ st_difference(researchbuffer)
 
 flatpwrc <- flatparkingwetr %>%
   st_difference(ccbuffer)
+
+campsite2 <- point_to_sf(-72.675647, 42.446949)
 
 leaflet() %>%
   addTiles() %>%
@@ -193,6 +201,7 @@ leaflet() %>%
             opacity = 1) %>%
   addMarkers(data = group_campsite, popup = "Group Campsite") %>%
   addMarkers(data = remote_campsite, popup = "Remote Campsite") %>%
+  addMarkers(data = campsite2, popup = "Campsite 2") %>%
   addPolygons(data = flatpwrc, color = "red")
 ```
 
