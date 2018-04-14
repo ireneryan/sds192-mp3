@@ -2,20 +2,6 @@
 title: "mp3: final"
 output: html_document
 ---
-##In addition to two plots with a campsite each, maybe inclide one that has the blue regions that could work?
-
-#I think our buffer is the wrong size, need to double it like it was before
-
-
-#Abandonded pasture could work, depends when it was abandoned (according to Reed), better than the "old field/pasture"
-
-#Not the vernal pool area, TOO MANY MOSQUITOS AND WET!!
-
-#10x10 feet campsite, 20x25 for bigger
-
-#Campsite in sugar maple would not disrupt tapping
-
-#getting materials in to the site is hard, need 4 wheel drive vehicle, takes lumber, harder if further away from the parking lot ($3000 to build the group campsite's lean-to)
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
@@ -29,6 +15,7 @@ library(RColorBrewer)
 
 #Extracting Data
 
+Here we simply extracted the macleish layers to make working with them easier.
 ```{r, message=FALSE}
 trails<-macleish_layers[["trails"]]
 boundary<-macleish_layers[["boundary"]]
@@ -49,6 +36,7 @@ contours<-macleish_layers[["contours_3m"]]
 
 #Points
 
+In order to work with the coordinates listed in the instructions, we used a function that would convert them to latitude and longitude geometries. We also aggregated/tidied the forest layer so that all of the same forest types had their geometries together. The proj4-aea line was so we could convert the data to the Alber's Equal Area projection, which is in meters, so the data had an easy unit to work with.
 ```{r, message=FALSE}
 proj4_aea <- "+proj=aea +lat_1=29.5 +lat_2=42.5 +lat_0=37.5 +lon_0=-96 +x_0=0 +y_0=0 +ellps=GRS80 +datum=NAD83 +units=m +no_defs"
 
@@ -73,7 +61,8 @@ aggforests<-forests%>%
 
 #Buffers
 
-```{r, message=FALSE}
+This was how we created the regions of plausible and impossible campsites. We converted them to the aea projection so we could work in meters, then converted them back to EPSG 4326 for mapping.
+```{r, message=FALSE, warning=FALSE}
 parking_buffer <- st_buffer(parking, dist = 804.672) %>%
   st_transform(crs = 4326)
 
@@ -108,6 +97,7 @@ wetlandbuffer<-wetlands%>%
 
 #Palettes
 
+These are the palettes for the forest types and the contours layer.
 ```{r, message=FALSE}
 forestpalette<-colorFactor(palette = "viridis",
                     domain = aggforests$Sheet1__Na)
@@ -118,6 +108,7 @@ pale <- colorNumeric(palette = "inferno",
 
 #Full exploration plot
 
+Here we plotted ALL of the requirements at once. It's quite messy, but we ultimately pared it down using st_intersection/st_difference in the individual campsite plots.
 ```{r, message=FALSE}
 leaflet() %>%
   addTiles() %>%
@@ -141,12 +132,13 @@ addPolygons(data = parking_buffer, color = "green") %>%
              popup = "Bechtel Environmental Classroom") %>%
   addPolygons(data = contours, color = ~pale(ELEV_M), weight = 0.5) %>%
   addPolygons(data=wetlandbuffer, color="green")%>%
-  addLegend("bottomright", pal = pale, values = contours$ELEV_M)
+  addLegend("bottomright", pal = pale, values = contours$ELEV_M, opacity=1)
 
 ```
 
 #Campsite 1
 
+In order to find the regions we could place a site, we used a series of st_intersection() and st_difference on the buffers we created. You can see the highlighted areas in red where these intersections and differences coincide to give us the possible locations.
 ```{r, message=FALSE}
 flatland<-contours%>%
   filter(ELEV_M<=220)
@@ -166,14 +158,15 @@ fpsrc<-fpsr%>%
 leaflet()%>%
   addTiles%>%
   addPolygons(data=aggforests, color = ~forestpalette(aggforests$Sheet1__Na), fillOpacity = 1)%>%
-  addLegend("bottomright", pal = forestpalette, values = aggforests$Sheet1__Na)%>%
+  addLegend("bottomright", pal = forestpalette, values = aggforests$Sheet1__Na, opacity=1)%>%
   addMarkers(data = group_campsite, popup = "Group Campsite") %>%
   addMarkers(data = remote_campsite, popup = "Remote Campsite")%>%
-    addPolygons(data=fpsrc)
+    addPolygons(data=fpsrc, color="red")
 ```
  
 #Campsite 2
  
+Same process as in campsite 1.
 ```{r}
 flatparkingwet<-flatparking%>%
   st_intersection(wetlandbuffer)
@@ -188,10 +181,16 @@ flatpwrc<-flatparkingwetr%>%
 leaflet()%>%
   addTiles%>%
   addPolygons(data=aggforests, color = ~forestpalette(aggforests$Sheet1__Na), fillOpacity = 1)%>%
-  addLegend("bottomright", pal = forestpalette, values = aggforests$Sheet1__Na)%>%
+  addLegend("bottomright", pal = forestpalette, values = aggforests$Sheet1__Na, opacity=1)%>%
   addMarkers(data = group_campsite, popup = "Group Campsite") %>%
   addMarkers(data = remote_campsite, popup = "Remote Campsite")%>%
-    addPolygons(data=flatpwrc)
+    addPolygons(data=flatpwrc, color="red")
 ```
 
-
+#Final Plot of Proposed Sites
+```{r}
+leaflet()%>%
+  addTiles%>%
+  addPolygons(data=aggforests, color = ~forestpalette(aggforests$Sheet1__Na), fillOpacity = 1)%>%
+  addLegend("bottomright", pal = forestpalette, values = aggforests$Sheet1__Na, opacity=1)
+```
