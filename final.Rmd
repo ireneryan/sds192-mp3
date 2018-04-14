@@ -12,25 +12,25 @@ library(leaflet)
 library(RColorBrewer)
 ```
 
-#Extracting Data
+# Extracting Data
 
 Here we simply extracted the macleish layers to make working with them easier.
 ```{r, message=FALSE}
-trails<-macleish_layers[["trails"]]
-boundary<-macleish_layers[["boundary"]]
+trails <- macleish_layers[["trails"]]
+boundary <- macleish_layers[["boundary"]]
 
-streams<-macleish_layers[["streams"]]
-wetlands<-macleish_layers[["wetlands"]]
+streams <- macleish_layers[["streams"]]
+wetlands <- macleish_layers[["wetlands"]]
 
-forests<-macleish_layers[["forests"]]
+forests <- macleish_layers[["forests"]]
 
-research<-macleish_layers[["research"]]
-buildings<-macleish_layers[["buildings"]]
+research <- macleish_layers[["research"]]
+buildings <- macleish_layers[["buildings"]]
 
-landmarks<-macleish_layers[["landmarks"]]
-challengecourses<-macleish_layers[["challenge_courses"]]
+landmarks <- macleish_layers[["landmarks"]]
+challengecourses <- macleish_layers[["challenge_courses"]]
 
-contours<-macleish_layers[["contours_3m"]]
+contours <- macleish_layers[["contours_3m"]]
 ```
 
 #Points
@@ -48,10 +48,7 @@ parking <- point_to_sf(-72.680663, 42.448013) %>%
   st_transform(crs = proj4_aea)
 
 group_campsite <- point_to_sf(-72.678154, 42.450976) 
-<<<<<<< HEAD
-=======
 
->>>>>>> f1627d61c832a298bda7961f0f1ac23afb6fe69d
 remote_campsite <- point_to_sf(-72.679581, 42.458549)
 
 bechtel <- data.frame(lat = 42.449167, lon = -72.679389)
@@ -61,7 +58,7 @@ aggforests<-forests%>%
   summarise(n=n())
 ```
 
-#Buffers
+# Buffers
 
 This was how we created the regions of plausible and impossible campsites. We converted them to the aea projection so we could work in meters, then converted them back to EPSG 4326 for mapping.
 ```{r, message=FALSE, warning=FALSE}
@@ -81,118 +78,133 @@ streams_buffer <- streams_inside %>%
   st_buffer(dist = 30.48) %>%
   st_transform(4326)
 
-ccbuffer<-challengecourses%>%
+ccbuffer <- challengecourses %>%
   st_transform(proj4_aea) %>%
   st_buffer(dist = 68.58) %>%
   st_transform(4326)
 
-researchbuffer<-research%>%
+researchbuffer  <-research %>%
   st_transform(proj4_aea) %>%
   st_buffer(dist = 68.58) %>%
   st_transform(4326)
 
-wetlandbuffer<-wetlands%>%
+wetlandbuffer <- wetlands %>%
   st_transform(proj4_aea) %>%
   st_buffer(dist = 68.58) %>%
   st_transform(4326)
 ```
 
-#Palettes
+# Palettes
 
 These are the palettes for the forest types and the contours layer.
 ```{r, message=FALSE}
-forestpalette<-colorFactor(palette = "viridis",
+forestpalette <- colorFactor(palette = "viridis",
                     domain = aggforests$Sheet1__Na)
 
 pale <- colorNumeric(palette = "inferno",
                     domain = contours$ELEV_M)
 ```
 
-#Full exploration plot
+# Full exploration plot
 
 Here we plotted ALL of the requirements at once. It's quite messy, but we ultimately pared it down using st_intersection/st_difference in the individual campsite plots.
 ```{r, message=FALSE}
 leaflet() %>%
   addTiles() %>%
-  addPolygons(data = boundary, weight = 1, fillOpacity = 0.1)%>%
+  addPolygons(data = boundary, weight = 1, fillOpacity = 0.1) %>%
   addMarkers(data = st_transform(parking, crs = 4326), popup = "Parking") %>%
-  addMarkers(data = group_campsite, popup = "Group Campsite")%>%
+  addMarkers(data = group_campsite, popup = "Group Campsite") %>%
   addMarkers(data = remote_campsite, popup = "Remote Campsite") %>%
-addPolygons(data = parking_buffer, color = "green") %>%
-  addPolygons(data = buildings, weight = 1, opacity = 1)%>%
+  addPolygons(data = parking_buffer, color = "green") %>%
+  addPolygons(data = buildings, weight = 1, opacity = 1) %>%
   addPolygons(data = parking_buffer, color = "green") %>%
   addPolylines(data = streams_buffer, fillOpacity = 0.5) %>%
   addPolygons(data = buildings, weight = 1, opacity = 1) %>%
   addPolygons(data = parking_buffer, color = "red") %>%
-  addPolylines(data = streams_buffer, fillOpacity = 0.5, color="green")%>%
- addPolygons(data = researchbuffer,fillOpacity = 0, weight=.5)%>%
-  addPolygons(data=ccbuffer, fillOpacity = 0, weight=.5)%>%
-  addPolygons(data=wetlands)%>%
-  addMarkers(data=challengecourses)%>%
-  addPolygons(data=research)%>%
+  addPolylines(data = streams_buffer, fillOpacity = 0.5, color="green") %>%
+  addPolygons(data = researchbuffer,fillOpacity = 0, weight=.5)%>%
+  addPolygons(data = ccbuffer, fillOpacity = 0, weight=.5)%>%
+  addPolygons(data = wetlands)%>%
+  addMarkers(data = challengecourses)%>%
+  addPolygons(data = research)%>%
   addMarkers(lng = ~lon, lat = ~lat, data = bechtel,
              popup = "Bechtel Environmental Classroom") %>%
   addPolygons(data = contours, color = ~pale(ELEV_M), weight = 0.5) %>%
-  addPolygons(data=wetlandbuffer, color="green")%>%
-  addLegend("bottomright", pal = pale, values = contours$ELEV_M, opacity=1)
+  addPolygons(data = wetlandbuffer, color = "green")%>%
+  addLegend("bottomright", pal = pale, values = contours$ELEV_M, opacity = 1)
 
 ```
 
-#Campsite 1
+# Campsite 1
 
 In order to find the regions we could place a site, we used a series of st_intersection() and st_difference on the buffers we created. You can see the highlighted areas in red where these intersections and differences coincide to give us the possible locations.
 ```{r, message=FALSE}
-flatland<-contours%>%
+flatland <- contours %>%
   filter(ELEV_M<=220)
 
-flatparking<-flatland%>%
+flatparking <- flatland %>%
   st_intersection(parking_buffer)
 
-flatparkingstream<-flatparking%>%
+flatparkingstream <- flatparking %>%
   st_intersection(streams_buffer)
 
 fpsr<-flatparkingstream%>%
   st_difference(researchbuffer)
 
-fpsrc<-fpsr%>%
+fpsrc <- fpsr %>%
   st_difference(ccbuffer)
 
-leaflet()%>%
-  addTiles%>%
-  addPolygons(data=aggforests, color = ~forestpalette(aggforests$Sheet1__Na), fillOpacity = 1)%>%
-  addLegend("bottomright", pal = forestpalette, values = aggforests$Sheet1__Na, opacity=1)%>%
+leaflet() %>%
+  addTiles() %>%
+  addPolygons(data = aggforests, 
+              color = ~forestpalette(aggforests$Sheet1__Na), 
+              fillOpacity = 1) %>%
+  addLegend("bottomright", 
+            pal = forestpalette,
+            values = aggforests$Sheet1__Na,
+            opacity=1) %>%
   addMarkers(data = group_campsite, popup = "Group Campsite") %>%
-  addMarkers(data = remote_campsite, popup = "Remote Campsite")%>%
-    addPolygons(data=fpsrc, color="red")
+  addMarkers(data = remote_campsite, popup = "Remote Campsite") %>%
+  addPolygons(data = fpsrc, color="red")
 ```
  
-#Campsite 2
+# Campsite 2
  
 Same process as in campsite 1.
 ```{r}
-flatparkingwet<-flatparking%>%
+flatparkingwet <- flatparking %>%
   st_intersection(wetlandbuffer)
 
-flatparkingwetr<-flatparkingwet%>%
+flatparkingwetr <- flatparkingwet %>%
 st_difference(researchbuffer)
 
 
-flatpwrc<-flatparkingwetr%>%
+flatpwrc <- flatparkingwetr %>%
   st_difference(ccbuffer)
 
-leaflet()%>%
-  addTiles%>%
-  addPolygons(data=aggforests, color = ~forestpalette(aggforests$Sheet1__Na), fillOpacity = 1)%>%
-  addLegend("bottomright", pal = forestpalette, values = aggforests$Sheet1__Na, opacity=1)%>%
+leaflet() %>%
+  addTiles() %>%
+  addPolygons(data=aggforests,
+              color = ~forestpalette(aggforests$Sheet1__Na),
+              fillOpacity = 1) %>%
+  addLegend("bottomright",
+            pal = forestpalette,
+            values = aggforests$Sheet1__Na,
+            opacity = 1) %>%
   addMarkers(data = group_campsite, popup = "Group Campsite") %>%
-  addMarkers(data = remote_campsite, popup = "Remote Campsite")%>%
-    addPolygons(data=flatpwrc, color="red")
+  addMarkers(data = remote_campsite, popup = "Remote Campsite") %>%
+  addPolygons(data = flatpwrc, color = "red")
 ```
 
-#Final Plot of Proposed Sites
+# Final Plot of Proposed Sites
 ```{r}
-leaflet()%>%
-  addTiles%>%
-  addPolygons(data=aggforests, color = ~forestpalette(aggforests$Sheet1__Na), fillOpacity = 1)%>%
-  addLegend("bottomright", pal = forestpalette, values = aggforests$Sheet1__Na, opacity=1)
+leaflet() %>%
+  addTiles() %>%
+  addPolygons(data = aggforests,
+              color = ~forestpalette(aggforests$Sheet1__Na),
+              fillOpacity = 1) %>%
+  addLegend("bottomright",
+            pal = forestpalette,
+            values = aggforests$Sheet1__Na,
+            opacity = 1)
 ```
