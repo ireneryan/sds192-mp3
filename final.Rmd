@@ -9,7 +9,6 @@ library(macleish)
 library(tidyverse)
 library(sf)
 library(leaflet)
-library(units)
 library(RColorBrewer)
 ```
 
@@ -49,7 +48,10 @@ parking <- point_to_sf(-72.680663, 42.448013) %>%
   st_transform(crs = proj4_aea)
 
 group_campsite <- point_to_sf(-72.678154, 42.450976) 
+<<<<<<< HEAD
+=======
 
+>>>>>>> f1627d61c832a298bda7961f0f1ac23afb6fe69d
 remote_campsite <- point_to_sf(-72.679581, 42.458549)
 
 bechtel <- data.frame(lat = 42.449167, lon = -72.679389)
