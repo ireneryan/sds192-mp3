@@ -1,5 +1,6 @@
 ---
-title: "mp3: final"
+title: "Camping is In-tents"
+author: "Irene Ryan, Pinn Janvatanavit, Truc Tran"
 output: 
   html_document:
     code_folding: hide
@@ -14,7 +15,7 @@ library(leaflet)
 library(RColorBrewer)
 ```
 
-# Extracting Data
+# Extracting Data[^1]
 
 Here we simply extracted the macleish layers to make working with them easier.
 ```{r, message = FALSE}
@@ -217,3 +218,20 @@ leaflet() %>%
             values = aggforests$Sheet1__Na,
             opacity = 1)
 ```
+
+# Problem statement
+Macleish has two campsites: one near the Bechtel Environmental Classroom, and one remote campsite about a mile from the parking area. They are looking for a new campsite that has the following conditions: around half a mile from the parking area, precisely 200 feet from a source of water, in a different forest from the forest in the two other campsites, flat, and must be at least 500 feet either from a research area or a Challenge Course.  
+
+# Data
+We used Macleish package, and included layers such as trails, boundary, streams, wetlands, forests, research, buildings, landmarks, challenge courses and contours_3m, in order to find the new campsite. In order to see where possible locations  for a campsite were, and what areas of the property were off limits we used a series of buffers around these data. For example, we set up a half mile buffer around the parking lot in order to see what parts of the property were close enough to it to become a campsite. (See inline annotations for wrangling, analysis) 
+
+# Conclusion
+According to our leaflet map, the new campsite should be located either in the sugar maple forest or the old white pine forest. The sugar maple forest is a good forest to camp at because it is relatively flat and dry. Initially, we were concerned that camping would affect the maple syrup collection. However, Reid assured us that the tapping season usually takes place during the period where people do not usually camp due to the freezing cold weather at night. Therefore, having a campsite in sugar maple forest would not disrupt the tapping procedure. According to the National Park Service, if the area has many dead trees, it could be hazard to camp because there is a chance that the trees may fall and injure campers.[^2]
+
+One of the major roadblocks on building a new campsite is getting the materials into the forest. Even though the sugar maple forest is relatively close to the parking space or the main build building, it could still cause difficulties in getting the construction materials into the selected forest because the staff members have to carry them from the parking lot or the main building, which could be labour intensive and slow down the process of construction.  We estimated that it would take around a month, depending on the time of year and weather. We estimate the cost to be around $4000 to build a new campsite. This approximation is based on the cost of building the wooden lean-to in the group campsite, which cost $3000 for lumber and transportation. The extra $100 is for other work that may be involved such as clearing the campsite of vegetation, etc. There are also some environmental impacts that should be considered prior to building the new campsite: disposal of waste and hazard of campfire. Campers may not dispose waste properly and leave their waste behind, such as food scraps. Moreover, campfire may generate light and smoke pollution to the forest. These actions may cause disturbance to the environment and animals that live in the forest.[^3]
+
+
+
+[^1]: https://github.com/ireneryan/sds192-mp3
+[^2]: https://www.nps.gov/subjects/camping/finding-and-setting-up-a-campsite.htm
+[^3]: https://www.campjellystone.com/leave-no-trace-7-principles-reduce-environment-impact/
